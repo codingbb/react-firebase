@@ -3,7 +3,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 const Auth = () => {
@@ -63,6 +64,26 @@ const Auth = () => {
   };
 
   let toggleAccount = () => setNewAccount((prev) => !prev);
+  const onSocialClick = (e) => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        const user = result.user;
+        console.log(token, user);
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+  };
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -88,6 +109,10 @@ const Auth = () => {
       <div onClick={toggleAccount}>
         {newAccount ? "Login" : "Create Account"}
       </div>
+      <hr></hr>
+      <button name="google" onClick={onSocialClick}>
+        구글로 로그인
+      </button>
     </div>
   );
 };
