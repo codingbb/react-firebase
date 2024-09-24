@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { db } from "../firebase";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 
 const Post = ({ postObj, isOwner }) => {
   const [edit, setEdit] = useState(false);
@@ -10,6 +11,10 @@ const Post = ({ postObj, isOwner }) => {
     const yes = window.confirm("정말 삭제하시겠습니까?");
     if (yes) {
       await deleteDoc(doc(db, "posts", postObj.id));
+      const storage = getStorage();
+      // 지우고자 하는게 누구인지 콕 찝어서 참조 생성!
+      const storageRef = ref(storage, postObj.attachmentUrl);
+      deleteObject(storageRef);
     }
   };
   const toggleEditMode = () => setEdit((prev) => !prev);
