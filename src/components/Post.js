@@ -46,6 +46,9 @@ const Post = ({ postObj, isOwner }) => {
       ) : (
         <>
           <h4>{postObj.content}</h4>
+          {postObj.attachmentUrl && (
+            <img src={postObj.attachmentUrl} width="100px" alt="" />
+          )}
           {isOwner && (
             <>
               <button onClick={deletePost}>삭제</button>

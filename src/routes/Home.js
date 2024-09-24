@@ -10,11 +10,22 @@ import {
   orderBy,
 } from "firebase/firestore";
 import Post from "../components/Post";
+import {
+  getStorage,
+  ref,
+  uploadString,
+  getDownloadURL,
+} from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 const Home = ({ userObj }) => {
   const [post, setPost] = useState("");
   const [posts, setPosts] = useState([]);
   const [attachment, setAttachment] = useState();
+  const storage = getStorage();
+  const storageRef = ref(storage);
+  let attachmentUrl = "";
+
   // const getPosts = async () => {
   //   const querySnapshot = await getDocs(collection(db, "posts"));
   //   querySnapshot.forEach((doc) => {
@@ -52,19 +63,45 @@ const Home = ({ userObj }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    try {
-      // Add a new document with a generated id.
-      const docRef = await addDoc(collection(db, "posts"), {
-        content: post,
-        date: serverTimestamp(),
-        uid: userObj,
-      });
-      console.log("Document written with ID: ", docRef.id);
-      setPost("");
-    } catch (e) {
-      console.error("error ", e);
+    const storageRef = ref(storage, `${userObj}/${uuidv4()}`);
+
+    // url이 들어오면 할 일
+    const makePost = async (url) => {
+      try {
+        // Add a new document with a generated id.
+        const docRef = await addDoc(collection(db, "posts"), {
+          content: post,
+          date: serverTimestamp(),
+          uid: userObj,
+          attachmentUrl: url, // attachment의 필드에 url이 들어오도록 바꾼다.
+        });
+        // console.log("Document written with ID: ", docRef.id);
+        setAttachment(""); // base64 쫙~ 나왔던걸 비워주는 것임
+        myForm.reset();
+        setPost("");
+      } catch (e) {
+        console.error("error ", e);
+      }
+    };
+
+    if (attachment) {
+      // 첨부한 이미지에 절대 경로를 출력해주는 애가 작동
+      uploadString(storageRef, attachment, "data_url").then(
+        async (snapshot) => {
+          // console.log("Uploaded a data_url string!");
+          // console.log(await getDownloadURL(storageRef));
+          attachmentUrl = await getDownloadURL(storageRef);
+          // 첨부파일 url 을 인수로 전달
+          makePost(attachmentUrl);
+        }
+      );
+    } else {
+      // 위에 let attachmentUrl = ""; 있으니 빈값이 들어가겠죠
+      makePost(attachmentUrl);
     }
   };
+
+  let myForm = document.querySelector("form");
 
   const onFileChange = (e) => {
     // const theFile = e.target.files[0];
