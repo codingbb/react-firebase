@@ -64,6 +64,15 @@ const Home = ({ userObj }) => {
       console.error("error ", e);
     }
   };
+
+  const onFileChange = (e) => {
+    // const theFile = e.target.files[0];
+    const {
+      target: { files },
+    } = e;
+    const theFile = files[0];
+    console.log(theFile);
+  };
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -73,17 +82,14 @@ const Home = ({ userObj }) => {
           placeholder="새 포스트를 입력하세요"
           onChange={onChange}
         ></input>
+        <input type="file" accept="image/*" onChange={onFileChange}></input>
         <button type="submit">등록</button>
       </form>
       <hr></hr>
       <h3>Post List</h3>
       <ul>
         {posts.map((item) => (
-          <Post
-            key={item.id}
-            postObj={item.content}
-            isOwner={item.id === userObj}
-          />
+          <Post key={item.id} postObj={item} isOwner={item.uid === userObj} />
         ))}
       </ul>
     </div>
