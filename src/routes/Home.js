@@ -14,6 +14,7 @@ import Post from "../components/Post";
 const Home = ({ userObj }) => {
   const [post, setPost] = useState("");
   const [posts, setPosts] = useState([]);
+  const [attachment, setAttachment] = useState();
   // const getPosts = async () => {
   //   const querySnapshot = await getDocs(collection(db, "posts"));
   //   querySnapshot.forEach((doc) => {
@@ -71,19 +72,44 @@ const Home = ({ userObj }) => {
       target: { files },
     } = e;
     const theFile = files[0];
-    console.log(theFile);
+    // console.log(theFile);
+    const reader = new FileReader();
+    reader.onloadend = (e) => {
+      console.log(e);
+      const {
+        target: { result },
+      } = e;
+      setAttachment(result);
+    };
+    reader.readAsDataURL(theFile);
+  };
+  console.log(attachment);
+  const onClearFile = () => {
+    setAttachment(null);
   };
   return (
     <div>
       <form onSubmit={onSubmit}>
-        <input
-          type="text"
-          value={post}
-          placeholder="새 포스트를 입력하세요"
-          onChange={onChange}
-        ></input>
-        <input type="file" accept="image/*" onChange={onFileChange}></input>
-        <button type="submit">등록</button>
+        <p>
+          <input
+            type="text"
+            value={post}
+            placeholder="새 포스트를 입력하세요"
+            onChange={onChange}
+          ></input>
+          <input type="file" accept="image/*" onChange={onFileChange}></input>
+        </p>
+        {attachment && (
+          <>
+            <img src={attachment} width="100px" alt="" />
+            <button type="button" onClick={onClearFile}>
+              업로드 취소
+            </button>
+          </>
+        )}
+        <p>
+          <button type="submit">등록</button>
+        </p>
       </form>
       <hr></hr>
       <h3>Post List</h3>
