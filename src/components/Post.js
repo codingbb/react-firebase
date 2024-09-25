@@ -51,6 +51,7 @@ const Post = ({ postObj, isOwner }) => {
       ) : (
         <>
           <h4>{postObj.content}</h4>
+          <h5>- {postObj.name} -</h5>
           {postObj.attachmentUrl && (
             <img src={postObj.attachmentUrl} width="100px" alt="" />
           )}

@@ -63,7 +63,7 @@ const Home = ({ userObj }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const storageRef = ref(storage, `${userObj}/${uuidv4()}`);
+    const storageRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
 
     // url이 들어오면 할 일
     const makePost = async (url) => {
@@ -72,8 +72,9 @@ const Home = ({ userObj }) => {
         const docRef = await addDoc(collection(db, "posts"), {
           content: post,
           date: serverTimestamp(),
-          uid: userObj,
+          uid: userObj.uid,
           attachmentUrl: url, // attachment의 필드에 url이 들어오도록 바꾼다.
+          name: userObj.displayName,
         });
         // console.log("Document written with ID: ", docRef.id);
         setAttachment(""); // base64 쫙~ 나왔던걸 비워주는 것임
