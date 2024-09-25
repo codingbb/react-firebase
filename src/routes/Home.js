@@ -111,15 +111,21 @@ const Home = ({ userObj }) => {
     } = e;
     const theFile = files[0];
     // console.log(theFile);
-    const reader = new FileReader();
-    reader.onloadend = (e) => {
-      console.log(e);
-      const {
-        target: { result },
-      } = e;
-      setAttachment(result);
-    };
-    reader.readAsDataURL(theFile);
+
+    if (theFile.size > 2 * 1024 * 1024) {
+      alert("파일 사이즈는 2MB를 넘을 수 없습니다.");
+      myForm.reset();
+    } else {
+      const reader = new FileReader();
+      reader.onloadend = (e) => {
+        console.log(e);
+        const {
+          target: { result },
+        } = e;
+        setAttachment(result);
+      };
+      reader.readAsDataURL(theFile);
+    }
   };
   console.log(attachment);
   const onClearFile = () => {
